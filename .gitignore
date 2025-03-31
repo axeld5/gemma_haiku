@@ -1,0 +1,4 @@
+haiku_dataset/
+.env
+lab/
+train_dataset/
