@@ -1,0 +1,8 @@
+unsloth
+vllm
+trl
+datasets
+accelerate
+transformers
+pandas
+numpy

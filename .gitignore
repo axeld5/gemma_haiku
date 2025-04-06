@@ -2,3 +2,5 @@ haiku_dataset/
 .env
 lab/
 train_dataset/
+eval_dataset/
+unsloth_compiled_cache/
