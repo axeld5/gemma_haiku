@@ -31,3 +31,21 @@ def reward_similarity(summary:str, haiku:str):
     embedding_2 = model.encode(summary, convert_to_tensor=True)
     value = util.pytorch_cos_sim(embedding_1, embedding_2)
     return value - 0.5
+
+def compute_train_rewards(prompts, completions, answer, **kwargs):
+    question = prompts[0][-1]["content"]
+    assignment = prompts[0][-1]["content"].split(":")[1].strip()
+    responses = [completion[0]["content"] for completion in completions]
+
+    extracted_responses = [
+        #r.split("model\n")[1].split("\n<end_of_turn>")[0].strip()
+        r.strip()
+        for r in responses
+    ]
+
+    scores = []
+    print('*'*20, f"Question:\n{question}", f"\nAnswer:\n{answer[0]}", f"\nResponse:\n{responses[0]}", f"\nExtracted:\n{extracted_responses[0]}")
+    for response in extracted_responses:
+        scores.append(reward_haiku(response) + reward_similarity(assignment, response))
+        continue
+    return scores
