@@ -4,6 +4,9 @@ from unsloth.chat_templates import standardize_data_formats
 from datasets import load_dataset
 from trl import SFTTrainer, SFTConfig
 from unsloth.chat_templates import train_on_responses_only
+from huggingface_hub import login
+
+login()
 
 model, tokenizer = FastModel.from_pretrained(
     model_name = "unsloth/gemma-3-1b-it",
