@@ -70,5 +70,5 @@ trainer = train_on_responses_only(
 
 trainer_stats = trainer.train()
 
-model.save_pretrained("gemma-3-haiku")  # Local saving
-tokenizer.save_pretrained("gemma-3-haiku")
+model.save_pretrained("gemma-3-1b-haiku")  # Local saving
+tokenizer.save_pretrained("gemma-3-1b-haiku")
