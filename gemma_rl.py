@@ -69,11 +69,14 @@ training_args = GRPOConfig(
     output_dir = "outputs",
 )
 
+def reward_bad():
+    return 0
+
 trainer = GRPOTrainer(
     model = model,
     processing_class = tokenizer,
     reward_funcs = [
-        compute_train_rewards
+        reward_bad
     ],
     args = training_args,
     train_dataset = dataset,
