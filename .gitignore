@@ -2,3 +2,4 @@ haiku_dataset/
 .env
 lab/
 unsloth_compiled_cache/
+test.ipynb
