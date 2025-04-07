@@ -6,3 +6,6 @@ accelerate
 transformers
 pandas
 numpy
+pyphen
+bitsandbytes
+sentence_transformers

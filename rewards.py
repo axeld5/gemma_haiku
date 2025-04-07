@@ -33,8 +33,8 @@ def reward_similarity(summary:str, haiku:str):
     return value - 0.5
 
 def compute_train_rewards(prompts, completions, answer, **kwargs):
-    question = prompts[0][-1]["content"]
-    assignment = prompts[0][-1]["content"].split(":")[1].strip()
+    question = prompts[0][0]["content"]
+    assignment = prompts[0][0]["content"].split(":")[1].strip()
     responses = [completion[0]["content"] for completion in completions]
 
     extracted_responses = [
