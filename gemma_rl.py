@@ -1,10 +1,10 @@
-from unsloth import FastLanguageModel
-from unsloth.chat_templates import get_chat_template
 import json
 from datasets import Dataset
 
 from trl import GRPOConfig, GRPOTrainer
+from peft import LoraConfig, get_peft_model
 from rewards import compute_train_rewards
+from transformers import AutoModelForCausalLM
 
 with open("train_dataset/rl_data.json", "r") as f:
     data = json.load(f)
@@ -21,36 +21,25 @@ dataset = Dataset.from_list(rows)
 max_seq_length = 2048
 lora_rank = 32  # Larger rank = smarter, but slower
 
-model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name="google/gemma-3-1b-it",
-    max_seq_length=max_seq_length,
-    load_in_4bit=True,  # False for LoRA 16bit
-    fast_inference=True,  # Enable vLLM fast inference
-    max_lora_rank=lora_rank,
-    gpu_memory_utilization=0.6,  # Reduce if out of memory
+
+model_id = "google/gemma-3-1b-it"
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    torch_dtype="auto",
+    device_map="auto",
 )
 
-model = FastLanguageModel.get_peft_model(
-    model,
-    r=lora_rank,  # Choose any number > 0 ! Suggested 8, 16, 32, 64, 128
-    target_modules=[
-        "q_proj",
-        "k_proj",
-        "v_proj",
-        "o_proj",
-        "gate_proj",
-        "up_proj",
-        "down_proj",
-    ],  # Remove QKVO if out of memory
-    lora_alpha=lora_rank,
-    use_gradient_checkpointing="unsloth",  # Enable long context finetuning
-    random_state=3407,
+lora_config = LoraConfig(
+    task_type="CAUSAL_LM",
+    r=8,
+    lora_alpha=32,
+    lora_dropout=0.1,
+    target_modules=["q_proj", "v_proj"],
 )
 
-tokenizer = get_chat_template(
-    tokenizer,
-    chat_template = "gemma-3",
-)
+model = get_peft_model(model, lora_config)
+
+model.print_trainable_parameters()
 
 max_prompt_length = 256
 
@@ -81,7 +70,6 @@ def reward_bad():
 
 trainer = GRPOTrainer(
     model = model,
-    processing_class = tokenizer,
     reward_funcs = [
         reward_bad
     ],
@@ -91,4 +79,3 @@ trainer = GRPOTrainer(
 trainer.train()
 
 model.save_pretrained("gemma-3-rl")  # Local saving
-tokenizer.save_pretrained("gemma-3-rl")
