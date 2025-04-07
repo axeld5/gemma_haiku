@@ -28,19 +28,6 @@ model, tokenizer = FastModel.from_pretrained(
     full_finetuning = False, # [NEW!] We have full finetuning now!
 )
 
-model = FastModel.get_peft_model(
-    model,
-    finetune_vision_layers     = False, # Turn off for just text!
-    finetune_language_layers   = True,  # Should leave on!
-    finetune_attention_modules = True,  # Attention good for GRPO
-    finetune_mlp_modules       = True,  # SHould leave on always!
-    r = 8,           # Larger = higher accuracy, but might overfit
-    lora_alpha = 8,  # Recommended alpha == r at least
-    lora_dropout = 0,
-    bias = "none",
-    random_state = 3407,
-)
-
 tokenizer = get_chat_template(
     tokenizer,
     chat_template = "gemma-3",
