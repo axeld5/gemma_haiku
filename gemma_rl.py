@@ -68,7 +68,7 @@ def reward_bad():
 trainer = GRPOTrainer(
     model = model,
     reward_funcs = [
-        compute_train_rewards
+        reward_bad
     ],
     args = training_args,
     train_dataset = dataset,
