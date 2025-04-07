@@ -1,4 +1,4 @@
-from unsloth import FastModel
+from unsloth import FastLanguageModel
 from unsloth.chat_templates import get_chat_template
 import json
 from datasets import Dataset
@@ -19,25 +19,32 @@ for example in data:
 dataset = Dataset.from_list(rows)
 
 max_seq_length = 2048
-model, tokenizer = FastModel.from_pretrained(
-    model_name = "unsloth/gemma-3-1b-it",
-    max_seq_length = max_seq_length, # Choose any for long context!
-    load_in_4bit = True,  # 4 bit quantization to reduce memory
-    load_in_8bit = False, # [NEW!] A bit more accurate, uses 2x memory
-    full_finetuning = False, # [NEW!] We have full finetuning now!
+lora_rank = 32  # Larger rank = smarter, but slower
+
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name="unsloth/gemma-3-1b-it",
+    max_seq_length=max_seq_length,
+    load_in_4bit=True,  # False for LoRA 16bit
+    fast_inference=True,  # Enable vLLM fast inference
+    max_lora_rank=lora_rank,
+    gpu_memory_utilization=0.6,  # Reduce if out of memory
 )
 
-model = FastModel.get_peft_model(
+model = FastLanguageModel.get_peft_model(
     model,
-    finetune_vision_layers     = False, # Turn off for just text!
-    finetune_language_layers   = True,  # Should leave on!
-    finetune_attention_modules = True,  # Attention good for GRPO
-    finetune_mlp_modules       = True,  # SHould leave on always!
-    r = 8,           # Larger = higher accuracy, but might overfit
-    lora_alpha = 8,  # Recommended alpha == r at least
-    lora_dropout = 0,
-    bias = "none",
-    random_state = 3407,
+    r=lora_rank,  # Choose any number > 0 ! Suggested 8, 16, 32, 64, 128
+    target_modules=[
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+    ],  # Remove QKVO if out of memory
+    lora_alpha=lora_rank,
+    use_gradient_checkpointing="unsloth",  # Enable long context finetuning
+    random_state=3407,
 )
 
 tokenizer = get_chat_template(
