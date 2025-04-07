@@ -44,7 +44,7 @@ def compute_train_rewards(prompts, completions, answer, **kwargs):
     ]
 
     scores = []
-    print('*'*20, f"Question:\n{question}", f"\nAnswer:\n{answer[0]}", f"\nResponse:\n{responses[0]}", f"\nExtracted:\n{extracted_responses[0]}")
+    print('*'*20, f"Question:\n{question}", f"\nResponse:\n{responses[0]}", f"\nExtracted:\n{extracted_responses[0]}")
     for response in extracted_responses:
         scores.append(reward_haiku(response) + reward_similarity(assignment, response))
         continue
