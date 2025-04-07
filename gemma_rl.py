@@ -22,7 +22,7 @@ max_seq_length = 2048
 lora_rank = 32  # Larger rank = smarter, but slower
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name="unsloth/gemma-3-1b-it",
+    model_name="google/gemma-3-1b-it",
     max_seq_length=max_seq_length,
     load_in_4bit=True,  # False for LoRA 16bit
     fast_inference=True,  # Enable vLLM fast inference
