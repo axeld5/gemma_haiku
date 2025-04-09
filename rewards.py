@@ -49,7 +49,6 @@ def compute_train_rewards(prompts, completions, **kwargs):
         for r in responses
     ]
     scores = []
-    print('*'*20, f"Question:\n{question}", f"\nReponse:\n{extracted_responses[0]}")
     for response in extracted_responses:
         scores.append(reward_three_lines(response) + reward_haiku(response) + reward_similarity(assignment, response))
         continue
