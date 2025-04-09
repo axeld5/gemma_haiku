@@ -19,7 +19,7 @@ for example in data:
 
 dataset = Dataset.from_list(rows)
 
-max_seq_length = 2048
+max_seq_length = 512
 model, tokenizer = FastModel.from_pretrained(
     model_name = "gemma-3-1b-haiku",
     max_seq_length = max_seq_length, # Choose any for long context!
