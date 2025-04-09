@@ -10,7 +10,7 @@ login()
 
 model, tokenizer = FastModel.from_pretrained(
     model_name = "unsloth/gemma-3-1b-it",
-    max_seq_length = 2048, # Choose any for long context!
+    max_seq_length = 512, # Choose any for long context!
     load_in_4bit = True,  # 4 bit quantization to reduce memory
     load_in_8bit = False, # [NEW!] A bit more accurate, uses 2x memory
     full_finetuning = False, # [NEW!] We have full finetuning now!
@@ -22,11 +22,10 @@ model = FastModel.get_peft_model(
     finetune_language_layers   = True,  # Should leave on!
     finetune_attention_modules = True,  # Attention good for GRPO
     finetune_mlp_modules       = True,  # SHould leave on always!
-    r = 8,           # Larger = higher accuracy, but might overfit
-    lora_alpha = 8,  # Recommended alpha == r at least
+    r = 32,           # Larger = higher accuracy, but might overfit
+    lora_alpha = 32,  # Recommended alpha == r at least
     lora_dropout = 0,
     bias = "none",
-    random_state = 3407,
 )
 
 tokenizer = get_chat_template(
@@ -42,6 +41,7 @@ def apply_chat_template(examples):
     return { "text" : texts }
 
 dataset = dataset.map(apply_chat_template, batched = True)
+print(dataset)
 
 trainer = SFTTrainer(
     model = model,
