@@ -71,5 +71,5 @@ trainer = GRPOTrainer(
 )
 trainer.train()
 
-model.save_pretrained("gemma-3-1b-sftrl-haiku")  # Local saving
-tokenizer.save_pretrained("gemma-3-1b-sftrl-haiku")
+model.save_pretrained("gemma-3-1b-sftrl-haiku-sparse")  # Local saving
+tokenizer.save_pretrained("gemma-3-1b-sftrl-haiku-sparse")
