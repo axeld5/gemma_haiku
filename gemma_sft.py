@@ -37,11 +37,10 @@ data = load_dataset('json', data_files="train_dataset/sft_data.json")["train"]
 dataset = standardize_data_formats(data)
 
 def apply_chat_template(examples):
-    texts = tokenizer.apply_chat_template(examples["conversations"])
+    texts = tokenizer.apply_chat_template(examples["conversations"], tokenize=False, add_generation_prompt=True)
     return { "text" : texts }
 
 dataset = dataset.map(apply_chat_template, batched = True)
-print(dataset)
 
 trainer = SFTTrainer(
     model = model,
