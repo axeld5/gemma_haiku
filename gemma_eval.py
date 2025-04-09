@@ -35,6 +35,7 @@ def eval_model(model_path, prompts):
 if __name__ == "__main__":
     dataset = load_dataset("json", data_files="eval_dataset/eval_data.json")["train"]
     prompts = [elem["conversations"][0] for elem in dataset]
-    print(f"Average reward for the base model: {eval_model('unsloth/gemma-3-1b-it', prompts)}")
-    print(f"Average reward for the finetuned model: {eval_model('gemma-3-1b-haiku', prompts)}")
-    print(f"Average reward for the finetuned+RL model: {eval_model('gemma-3-1b-sftrl-haiku', prompts)}")
+    #print(f"Average reward for the base model: {eval_model('unsloth/gemma-3-1b-it', prompts)}")
+    #print(f"Average reward for the finetuned model: {eval_model('gemma-3-1b-haiku', prompts)}")
+    #print(f"Average reward for the finetuned+RL model: {eval_model('gemma-3-1b-sftrl-haiku', prompts)}")
+    print(f"Average reward for the finetuned+RL model: {eval_model('gemma-3-1b-sftrl-haiku-sparse', prompts)}")

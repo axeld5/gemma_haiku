@@ -63,7 +63,7 @@ training_args = GRPOConfig(
     max_prompt_length = max_prompt_length,
     max_completion_length = max_seq_length - max_prompt_length,
     num_train_epochs = 1, # Set to 1 for a full training run
-    max_steps = 50,
+    max_steps = 1000,
     save_steps = 50,
     max_grad_norm = 0.1,
     report_to = "none", # Can use Weights & Biases
@@ -81,5 +81,5 @@ trainer = GRPOTrainer(
 )
 trainer.train()
 
-model.save_pretrained("gemma-3-haiku-rl")  # Local saving
-tokenizer.save_pretrained("gemma-3-haiku-rl")
+model.save_pretrained("gemma-3-haiku-rl-sparse")  # Local saving
+tokenizer.save_pretrained("gemma-3-haiku-rl-sparse")
