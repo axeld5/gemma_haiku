@@ -29,7 +29,7 @@ def reward_three_lines(text):
     lines = [line.strip() for line in text.strip().split('\n') if line.strip()]
     if len(lines) != 3:
         return -1
-    return 0.1
+    return 0
 
 def reward_haiku(text:str) -> int:
     return int(is_haiku(text)[0])
@@ -51,7 +51,7 @@ def compute_train_rewards(prompts, completions, **kwargs):
     scores = []
     for response in extracted_responses:
         score = reward_three_lines(response) + reward_haiku(response)
-        if score > 1:
+        if score == 1:
             score += reward_similarity(assignment, response)
         scores.append(score)
         continue
