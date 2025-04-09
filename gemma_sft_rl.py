@@ -7,7 +7,10 @@ from trl import GRPOConfig, GRPOTrainer
 from rewards import compute_train_rewards
 
 with open("train_dataset/rl_data.json", "r") as f:
-    data = json.load(f)
+    rl_data = json.load(f)
+with open("train_dataset/sft_data.json", "r") as f:
+    sft_data = json.load(f)
+data = rl_data | sft_data
 rows = []
 for example in data:
     for turn in example["conversations"]:
