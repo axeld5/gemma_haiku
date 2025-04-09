@@ -6,7 +6,7 @@ from datasets import load_dataset
 def eval_model(model_path, prompts):
     model, tokenizer = FastModel.from_pretrained(
         model_name = model_path,
-        max_seq_length = 2048,
+        max_seq_length = 512,
         load_in_4bit = True,
     )
     n = len(prompts)
