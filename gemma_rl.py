@@ -19,7 +19,7 @@ for example in data:
 
 dataset = Dataset.from_list(rows)
 
-max_seq_length = 2048
+max_seq_length = 512
 model, tokenizer = FastModel.from_pretrained(
     model_name = "unsloth/gemma-3-1b-it",
     max_seq_length = max_seq_length, # Choose any for long context!
@@ -34,8 +34,8 @@ model = FastModel.get_peft_model(
     finetune_language_layers   = True,  # Should leave on!
     finetune_attention_modules = True,  # Attention good for GRPO
     finetune_mlp_modules       = True,  # SHould leave on always!
-    r = 8,           # Larger = higher accuracy, but might overfit
-    lora_alpha = 8,  # Recommended alpha == r at least
+    r = 64,           # Larger = higher accuracy, but might overfit
+    lora_alpha = 64,  # Recommended alpha == r at least
     lora_dropout = 0,
     bias = "none",
     random_state = 3407,
@@ -81,5 +81,5 @@ trainer = GRPOTrainer(
 )
 trainer.train()
 
-model.save_pretrained("gemma-3-rl")  # Local saving
-tokenizer.save_pretrained("gemma-3-rl")
+model.save_pretrained("gemma-3-haiku-rl")  # Local saving
+tokenizer.save_pretrained("gemma-3-haiku-rl")
