@@ -22,8 +22,8 @@ model = FastModel.get_peft_model(
     finetune_language_layers   = True,  # Should leave on!
     finetune_attention_modules = True,  # Attention good for GRPO
     finetune_mlp_modules       = True,  # SHould leave on always!
-    r = 32,           # Larger = higher accuracy, but might overfit
-    lora_alpha = 32,  # Recommended alpha == r at least
+    r = 64,           # Larger = higher accuracy, but might overfit
+    lora_alpha = 64,  # Recommended alpha == r at least
     lora_dropout = 0,
     bias = "none",
 )
@@ -52,7 +52,7 @@ trainer = SFTTrainer(
         per_device_train_batch_size = 2,
         gradient_accumulation_steps = 4, # Use GA to mimic batch size!
         warmup_steps = 5,
-        num_train_epochs = 1, # Set this for 1 full training run.
+        num_train_epochs = 10, # Set this for 1 full training run.
         max_steps = 30,
         learning_rate = 2e-4, # Reduce to 2e-5 for long training runs
         logging_steps = 1,
