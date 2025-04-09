@@ -11,6 +11,8 @@ def count_syllables(text, dic):
         syllable_count += hyphenated.count('-') + 1
     return syllable_count
 
+
+
 def is_haiku(text):
     dic = pyphen.Pyphen(lang='en')
     lines = [line.strip() for line in text.strip().split('\n') if line.strip()]
@@ -22,6 +24,12 @@ def is_haiku(text):
         return True, "Valid haiku"
     else:
         return False, f"Syllable pattern mismatch: {actual_syllables} (expected [5, 7, 5])"
+
+def reward_three_lines(text):
+    lines = [line.strip() for line in text.strip().split('\n') if line.strip()]
+    if len(lines) != 3:
+        return 0
+    return 0.2
 
 def reward_haiku(text:str) -> int:
     return int(is_haiku(text)[0])
@@ -40,10 +48,9 @@ def compute_train_rewards(prompts, completions, **kwargs):
         r.strip()
         for r in responses
     ]
-
     scores = []
-    print('*'*20, f"Question:\n{question}", f"\nResponse:\n{responses[0]}", f"\nExtracted:\n{extracted_responses[0]}")
+    print('*'*20, f"Question:\n{question}", f"\nReponse:\n{extracted_responses[0]}")
     for response in extracted_responses:
-        scores.append(reward_haiku(response) + reward_similarity(assignment, response))
+        scores.append(reward_three_lines(response) + reward_haiku(response) + reward_similarity(assignment, response))
         continue
     return scores
