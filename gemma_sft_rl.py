@@ -10,7 +10,7 @@ with open("train_dataset/rl_data.json", "r") as f:
     rl_data = json.load(f)
 with open("train_dataset/sft_data.json", "r") as f:
     sft_data = json.load(f)
-data = rl_data + sft_data
+data = rl_data
 rows = []
 for example in data:
     for turn in example["conversations"]:
