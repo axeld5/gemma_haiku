@@ -28,8 +28,8 @@ def is_haiku(text):
 def reward_three_lines(text):
     lines = [line.strip() for line in text.strip().split('\n') if line.strip()]
     if len(lines) != 3:
-        return 0
-    return 0.2
+        return -1
+    return 0.1
 
 def reward_haiku(text:str) -> int:
     return int(is_haiku(text)[0])
