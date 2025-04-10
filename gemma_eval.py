@@ -38,5 +38,6 @@ if __name__ == "__main__":
     #print(f"Average reward for the base model: {eval_model('unsloth/gemma-3-1b-it', prompts)}")
     #print(f"Average reward for the finetuned model: {eval_model('gemma-3-1b-haiku', prompts)}")
     #print(f"Average reward for the finetuned+RL model: {eval_model('gemma-3-1b-sftrl-haiku', prompts)}")
-    print(f"Average reward for the finetuned+RL model: {eval_model('gemma-3-1b-sftrl-haiku-sparse', prompts)}")
-    print(f"Average reward for the sole RL model: {eval_model('gemma-3-haiku-rl-sparse', prompts)}")
+    #print(f"Average reward for the finetuned+RL model: {eval_model('gemma-3-1b-sftrl-haiku-sparse', prompts)}")
+    #print(f"Average reward for the sole RL model: {eval_model('gemma-3-haiku-rl-sparse', prompts)}")
+    print(f"Average reward for the finetuned+RL model with sparse then continuous reward: {eval_model('gemma-3-1b-fullrun', prompts)}")
