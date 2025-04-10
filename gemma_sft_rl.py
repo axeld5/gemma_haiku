@@ -24,7 +24,7 @@ dataset = Dataset.from_list(rows)
 
 max_seq_length = 512
 model, tokenizer = FastModel.from_pretrained(
-    model_name = "gemma-3-1b-haiku",
+    model_name = "gemma-3-1b-sftrl-haiku-sparse",
     max_seq_length = max_seq_length, # Choose any for long context!
     load_in_4bit = True,  # 4 bit quantization to reduce memory
     load_in_8bit = False, # [NEW!] A bit more accurate, uses 2x memory
@@ -71,5 +71,5 @@ trainer = GRPOTrainer(
 )
 trainer.train()
 
-model.save_pretrained("gemma-3-1b-sftrl-haiku-sparse")  # Local saving
-tokenizer.save_pretrained("gemma-3-1b-sftrl-haiku-sparse")
+model.save_pretrained("gemma-3-1b-fullrun")  # Local saving
+tokenizer.save_pretrained("gemma-3-1b-fullrun")

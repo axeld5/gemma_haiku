@@ -40,8 +40,7 @@ def reward_similarity(summary:str, haiku:str):
     value = util.pytorch_cos_sim(embedding_1, embedding_2)
     return value - 0.5
 
-def compute_train_rewards(prompts, completions, **kwargs):
-    question = prompts[0][0]["content"]
+def compute_train_rewards_sparse(prompts, completions, **kwargs):
     assignment = prompts[0][0]["content"].split(":")[1].strip()
     responses = [completion[0]["content"] for completion in completions]
     extracted_responses = [
@@ -53,6 +52,21 @@ def compute_train_rewards(prompts, completions, **kwargs):
         score = reward_three_lines(response) + reward_haiku(response)
         if score == 1:
             score += reward_similarity(assignment, response)
+        scores.append(score)
+        continue
+    return scores
+
+def compute_train_rewards(prompts, completions, **kwargs):
+    assignment = prompts[0][0]["content"].split(":")[1].strip()
+    responses = [completion[0]["content"] for completion in completions]
+    extracted_responses = [
+        r.strip()
+        for r in responses
+    ]
+    scores = []
+    for response in extracted_responses:
+        score = reward_three_lines(response) + reward_haiku(response)
+        score += reward_similarity(assignment, response)
         scores.append(score)
         continue
     return scores
