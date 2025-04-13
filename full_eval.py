@@ -35,6 +35,29 @@ def load_training_answers(file_path="train_dataset/sft_data.json"):
         print(f"Error loading training answers: {e}")
         return {}
 
+def load_model(model_path):
+    """
+    Load a model from the specified path.
+    
+    Args:
+        model_path (str): Path to the model
+        
+    Returns:
+        tuple: (model, tokenizer) if successful, (None, None) if model not available
+    """
+    try:
+        print(f"Loading model from: {model_path}")
+        model, tokenizer = FastModel.from_pretrained(
+            model_name=model_path,
+            max_seq_length=512,
+            load_in_4bit=True,
+        )
+        return model, tokenizer
+    except Exception as e:
+        print(f"Error loading model {model_path}: {str(e)}")
+        print(f"Model {model_path} is not available. Skipping.")
+        return None, None
+
 def eval_model(model_path, prompts, print_interval=10, check_duplicates=True):
     """
     Evaluate a model on the given prompts with additional features.
@@ -55,11 +78,20 @@ def eval_model(model_path, prompts, print_interval=10, check_duplicates=True):
         print(f"Loaded {len(training_answers)} unique answers from training data")
     
     # Load the model
-    model, tokenizer = FastModel.from_pretrained(
-        model_name=model_path,
-        max_seq_length=512,
-        load_in_4bit=True,
-    )
+    model, tokenizer = load_model(model_path)
+    
+    # Skip evaluation if model is not available
+    if model is None or tokenizer is None:
+        return {
+            "model_path": model_path,
+            "is_haiku_avg": 0,
+            "similarity_avg": 0,
+            "total_avg": 0,
+            "duplicates": 0,
+            "duplicate_percentage": 0,
+            "total_samples": 0,
+            "error": "Model not available"
+        }
     
     n = len(prompts)
     haiku_val = 0
@@ -147,12 +179,16 @@ def save_results_to_csv(results, filename=None):
         filename = f"evaluation_results_{timestamp}.csv"
     
     fieldnames = ["model_path", "is_haiku_avg", "similarity_avg", "total_avg", 
-                 "duplicates", "duplicate_percentage", "total_samples"]
+                 "duplicates", "duplicate_percentage", "total_samples", "error"]
     
     with open(filename, 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for result in results:
+            # Ensure all fields are present
+            for field in fieldnames:
+                if field not in result:
+                    result[field] = ""
             writer.writerow(result)
     
     print(f"\nResults saved to {filename}")
@@ -162,7 +198,7 @@ if __name__ == "__main__":
     dataset = load_dataset("json", data_files="eval_dataset/eval_data.json")["train"]
     prompts = [elem["conversations"][0] for elem in dataset]
     
-    # List of models to evaluate (from gemma_eval.py comments)
+    # List of models to evaluate (from README)
     models = [
         "unsloth/gemma-3-1b-it",           # Base model
         "gemma-3-1b-haiku",                 # Finetuned model
@@ -180,34 +216,23 @@ if __name__ == "__main__":
     # Run evaluation for each model
     all_results = []
     for model_path in models:
-        try:
-            print(f"\n{'='*80}")
-            print(f"EVALUATING MODEL: {model_path}")
-            print(f"{'='*80}")
-            
-            results = eval_model(model_path, prompts)
-            all_results.append(results)
-            
-            # Print final results for this model
-            print("\nFINAL RESULTS:")
-            print(f"Model: {model_path}")
+        print(f"\n{'='*80}")
+        print(f"EVALUATING MODEL: {model_path}")
+        print(f"{'='*80}")
+        
+        results = eval_model(model_path, prompts)
+        all_results.append(results)
+        
+        # Print final results for this model
+        print("\nFINAL RESULTS:")
+        print(f"Model: {model_path}")
+        if "error" in results and results["error"]:
+            print(f"Error: {results['error']}")
+        else:
             print(f"Haiku Score: {results['is_haiku_avg']:.4f}")
             print(f"Similarity Score: {results['similarity_avg']:.4f}")
             print(f"Total Score: {results['total_avg']:.4f}")
             print(f"Duplicate Answers: {results['duplicates']} ({results['duplicate_percentage']*100:.2f}%)")
-            
-        except Exception as e:
-            print(f"Error evaluating model {model_path}: {e}")
-            all_results.append({
-                "model_path": model_path,
-                "is_haiku_avg": 0,
-                "similarity_avg": 0,
-                "total_avg": 0,
-                "duplicates": 0,
-                "duplicate_percentage": 0,
-                "total_samples": 0,
-                "error": str(e)
-            })
     
     # Save all results to a CSV file
     save_results_to_csv(all_results)
@@ -216,8 +241,9 @@ if __name__ == "__main__":
     print("\n" + "="*80)
     print("SUMMARY OF ALL MODELS")
     print("="*80)
-    print(f"{'Model':<40} {'Haiku':<10} {'Similarity':<10} {'Total':<10} {'Duplicates':<10}")
+    print(f"{'Model':<40} {'Haiku':<10} {'Similarity':<10} {'Total':<10} {'Duplicates':<10} {'Status':<10}")
     print("-"*80)
     for result in all_results:
-        print(f"{result['model_path']:<40} {result['is_haiku_avg']:.4f}    {result['similarity_avg']:.4f}    {result['total_avg']:.4f}    {result['duplicate_percentage']*100:.2f}%")
+        status = "Error" if "error" in result and result["error"] else "Success"
+        print(f"{result['model_path']:<40} {result['is_haiku_avg']:.4f}    {result['similarity_avg']:.4f}    {result['total_avg']:.4f}    {result['duplicate_percentage']*100:.2f}%    {status:<10}")
     print("="*80) 

@@ -16,6 +16,7 @@ The project aims to train language models to generate haikus that:
 - `gemma_sft_rl.py` - Combined SFT+RL approach for Gemma model
 - `gemma_eval.py` - Evaluation script for Gemma models
 - `gemini_eval.py` - Evaluation script for Gemini 2.0 Flash model
+- `full_eval.py` - Enhanced evaluation script with detailed output
 - `rewards.py` - Reward functions for haiku generation evaluation
 - `prompts.py` - Prompt templates for model interactions
 - `train_dataset/` - Training data for SFT and RL approaches
@@ -91,10 +92,11 @@ To evaluate Gemma models:
 python gemma_eval.py
 ```
 
-This will evaluate the model's performance on the evaluation dataset and report:
-- Haiku validity score
-- Semantic similarity score
-- Total combined score
+For more detailed evaluation with sample outputs and duplicate detection:
+
+```bash
+python full_eval.py
+```
 
 ### Gemini Model Evaluation
 
@@ -104,7 +106,50 @@ To evaluate the Gemini 2.0 Flash model:
 python gemini_eval.py
 ```
 
-This will evaluate Gemini's performance using the same metrics as the Gemma models.
+## Evaluation Results
+
+### Gemma Models
+
+| Model | Haiku Score | Similarity Score | Total Score | Duplicates |
+|-------|-------------|------------------|-------------|------------|
+| unsloth/gemma-3-1b-it | 0.0372 | -0.0998 | -0.0627 | 0.00% |
+| gemma-3-1b-haiku | 0.1351 | 0.1101 | 0.2453 | 0.00% |
+| gemma-3-1b-sftrl-haiku | 0.0878 | 0.3708 | 0.4587 | 0.00% |
+| gemma-3-1b-sftrl-haiku-sparse | 0.1858 | -0.0880 | 0.0978 | 0.00% |
+| gemma-3-haiku-rl-sparse | 0.1537 | -0.1206 | 0.0331 | 0.00% |
+| gemma-3-1b-fullrun | 0.2348 | 0.0588 | 0.2936 | 0.00% |
+
+### Gemini 2.0 Flash
+
+| Model | Haiku Score | Similarity Score | Total Score | Duplicates |
+|-------|-------------|------------------|-------------|------------|
+| Gemini 2.0 Flash | 0.2044 | -0.0919 | 0.1125 | 0.00% |
+
+## Model Performance Analysis
+
+### ⚠️ Important Note on Results
+
+**Please take these results with a grain of salt**: The Gemini Flash model appears to generate haikus very well on the 57 examples tested, but the pyphen function used for syllable counting is flawed, which means it gets penalized. Its score should be much higher otherwise.
+
+### Detailed Model Analysis
+
+#### Base Model (unsloth/gemma-3-1b-it)
+- **Low Score Explanation**: The base model's low score is primarily due to the added messages like "sure, I will generate a Haiku" that it includes in its responses, which don't follow the haiku format.
+
+#### Finetuned Model (gemma-3-1b-haiku)
+- **Performance Analysis**: The finetuned model achieves a moderate score but still struggles with the syllable requirements. It generally gets the "three lines" requirement correct but fails to get the syllable count right, resulting in haikus that are structurally incorrect.
+
+#### Finetuned+RL Model (gemma-3-1b-sftrl-haiku)
+- **Interesting Pattern**: This model shows an interesting pattern where it "hacks" the similarity reward. It first generates the words from the prompt and then fits them into a haiku-like structure. This explains both the moderate haiku score and the high similarity score, but it's not truly generating creative haikus.
+
+#### Finetuned+RL Model with Sparse Rewards (gemma-3-1b-sftrl-haiku-sparse)
+- **Partial Success**: This model shows signs of improvement in haiku generation but fails at following the instruction properly. It generates haiku-like outputs but doesn't always adhere to the prompt requirements.
+
+#### Sole RL Model with Sparse Rewards (gemma-3-haiku-rl-sparse)
+- **Incomplete Learning**: This model sometimes generates too much text instead of just a haiku. A longer training runtime would be required for it to completely understand the 3-line penalty and generate proper haikus consistently.
+
+#### Combined Approach (gemma-3-1b-fullrun)
+- **Best Performance**: This model represents the best of both worlds - it follows the 3-line requirement and instruction following from SFT, while also achieving a good balance of correct syllable counts from the RL component. It achieves the highest haiku score among all models.
 
 ## Reward Functions
 
