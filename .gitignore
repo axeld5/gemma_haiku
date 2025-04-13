@@ -1,5 +1,7 @@
-haiku_dataset/
 .env
 lab/
 unsloth_compiled_cache/
 test.ipynb
+haiku_dataset/
+models/
+eval_results/
