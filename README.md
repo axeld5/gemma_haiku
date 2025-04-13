@@ -1,6 +1,77 @@
-# Gemma Haiku Generator
+# Gemma Haiku Project
 
-This repository contains code for fine-tuning and evaluating language models to generate haikus based on given prompts. The project includes implementations for both Supervised Fine-Tuning (SFT) and Reinforcement Learning (RL) approaches, as well as evaluation scripts for both Gemma and Gemini models.
+This project fine-tunes Gemma models to generate haikus using different training approaches:
+- Supervised Fine-Tuning (SFT)
+- Reinforcement Learning (RL) with sparse rewards
+- RL with regular rewards
+- Combined SFT + RL approaches
+
+## Models
+
+The project trains and evaluates the following models:
+1. `gemma-3-1b-haiku` - Pure SFT model
+2. `gemma-3-haiku-rl-sparse` - Pure RL with sparse rewards
+3. `gemma-3-1b-sftrl-haiku` - SFT + RL with regular rewards
+4. `gemma-3-1b-sftrl-haiku-sparse` - SFT + RL with sparse rewards
+5. `gemma-3-1b-fullrun` - SFT + RL with sparse rewards + RL with regular rewards
+
+## Using Docker
+
+The easiest way to run this project is using Docker:
+
+### Prerequisites
+
+- Docker installed on your system
+- NVIDIA GPU with CUDA support (for training)
+
+### Building the Docker Image
+
+```bash
+docker build -t gemma-haiku .
+```
+
+### Running the Container
+
+```bash
+docker run --gpus all -v $(pwd)/models:/app/models -v $(pwd)/results:/app/eval_results gemma-haiku
+```
+
+This will:
+1. Train all models using the `train_models.py` script
+2. Evaluate all models using the `full_eval.py` script
+3. Save the evaluation results to the `results` directory
+
+### Customizing Training
+
+You can customize the training by modifying the Dockerfile or by running the container with different commands:
+
+```bash
+# Train only specific models
+docker run --gpus all -v $(pwd)/models:/app/models gemma-haiku python train_models.py --train_pure_sft --train_pure_rl_sparse
+
+# Evaluate only specific models
+docker run --gpus all -v $(pwd)/models:/app/models -v $(pwd)/results:/app/eval_results gemma-haiku python full_eval.py gemma-3-1b-haiku gemma-3-haiku-rl-sparse
+```
+
+## Manual Setup
+
+If you prefer to run the project without Docker:
+
+1. Install Python 3.12
+2. Install the requirements: `pip install -r requirements.txt`
+3. Run the training script: `python train_models.py`
+4. Run the evaluation script: `python full_eval.py`
+
+## Project Structure
+
+- `train_models.py` - Script to train all models
+- `gemma_sft.py` - SFT training implementation
+- `gemma_rl.py` - RL training implementation
+- `full_eval.py` - Evaluation script
+- `rewards.py` - Reward functions for RL training
+- `train_dataset/` - Directory for training data
+- `eval_dataset/` - Directory for evaluation data
+- `eval_results/` - Directory for evaluation results
 
 ## Overview
 
@@ -13,8 +84,6 @@ The project aims to train language models to generate haikus that:
 
 - `gemma_sft.py` - Supervised Fine-Tuning implementation for Gemma model
 - `gemma_rl.py` - Reinforcement Learning implementation for Gemma model
-- `gemma_sft_rl.py` - Combined SFT+RL approach for Gemma model
-- `gemma_eval.py` - Evaluation script for Gemma models
 - `gemini_eval.py` - Evaluation script for Gemini 2.0 Flash model
 - `full_eval.py` - Enhanced evaluation script with detailed output
 - `rewards.py` - Reward functions for haiku generation evaluation
@@ -46,7 +115,7 @@ GEMINI_API_KEY=your_gemini_api_key
 The SFT approach uses the `gemma_sft.py` script to fine-tune the Gemma model on haiku generation tasks:
 
 ```bash
-python gemma_sft.py
+python gemma_sft.py --model_name "unsloth/gemma-3-1b-it" --max_steps 200 --save_path "gemma-3-1b-haiku"
 ```
 
 This will:
@@ -60,7 +129,7 @@ This will:
 The RL approach uses the `gemma_rl.py` script to train the model using GRPO (Generative Reinforcement Policy Optimization):
 
 ```bash
-python gemma_rl.py
+python gemma_rl.py --model_name "unsloth/gemma-3-1b-it" --max_steps 200 --save_path "gemma-3-haiku-rl-sparse" --is_reward_sparse True
 ```
 
 This will:
@@ -71,10 +140,10 @@ This will:
 
 ### 3. Combined SFT+RL Approach
 
-The combined approach uses the `gemma_sft_rl.py` script to first fine-tune with SFT and then further improve with RL:
+The combined approach uses the `train_models.py` script to first fine-tune with SFT and then further improve with RL:
 
 ```bash
-python gemma_sft_rl.py
+python train_models.py --train_sft_rl_sparse_regular
 ```
 
 This will:
@@ -84,24 +153,21 @@ This will:
 
 ## Evaluation
 
-### Gemma Model Evaluation
+### Model Evaluation
 
-To evaluate Gemma models:
-
-```bash
-python gemma_eval.py
-```
-
-For more detailed evaluation with sample outputs and duplicate detection:
+To evaluate all models:
 
 ```bash
 python full_eval.py
 ```
 
-### Gemini Model Evaluation
+For evaluating specific models:
 
-To evaluate the Gemini 2.0 Flash model:
+```bash
+python full_eval.py gemma-3-1b-haiku gemma-3-haiku-rl-sparse
+```
 
+To perform evaluation specifically on Google Gemini-2.0-Flash:
 ```bash
 python gemini_eval.py
 ```
@@ -119,17 +185,7 @@ python gemini_eval.py
 | gemma-3-haiku-rl-sparse | 0.1537 | -0.1206 | 0.0331 | 0.00% |
 | gemma-3-1b-fullrun | 0.2348 | 0.0588 | 0.2936 | 0.00% |
 
-### Gemini 2.0 Flash
-
-| Model | Haiku Score | Similarity Score | Total Score | Train Overlap |
-|-------|-------------|------------------|-------------|------------|
-| Gemini 2.0 Flash | 0.2044 | -0.0919 | 0.1125 | 0.00% |
-
 ## Model Performance Analysis
-
-### ⚠️ Important Note on Results
-
-**Please take these results with a grain of salt**: The Gemini Flash model appears to generate haikus very well on the 57 examples tested, but the pyphen function used for syllable counting is flawed, which means it gets penalized. Its score should be much higher otherwise.
 
 ### Detailed Model Analysis
 
