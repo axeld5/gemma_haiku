@@ -110,7 +110,7 @@ python gemini_eval.py
 
 ### Gemma Models
 
-| Model | Haiku Score | Similarity Score | Total Score | Duplicates |
+| Model | Haiku Score | Similarity Score | Total Score | Train Overlap |
 |-------|-------------|------------------|-------------|------------|
 | unsloth/gemma-3-1b-it | 0.0372 | -0.0998 | -0.0627 | 0.00% |
 | gemma-3-1b-haiku | 0.1351 | 0.1101 | 0.2453 | 0.00% |
@@ -121,7 +121,7 @@ python gemini_eval.py
 
 ### Gemini 2.0 Flash
 
-| Model | Haiku Score | Similarity Score | Total Score | Duplicates |
+| Model | Haiku Score | Similarity Score | Total Score | Train Overlap |
 |-------|-------------|------------------|-------------|------------|
 | Gemini 2.0 Flash | 0.2044 | -0.0919 | 0.1125 | 0.00% |
 
