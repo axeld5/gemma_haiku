@@ -6,6 +6,8 @@ This project fine-tunes Gemma models to generate haikus using different training
 - RL with regular rewards
 - Combined SFT + RL approaches
 
+Models and dataset can be accessed at [axel-darmouni/haiku_dataset](https://huggingface.co/datasets/axel-darmouni/haiku_dataset) and [axel-darmouni/gemma-3-1b-haikuspec](https://huggingface.co/axel-darmouni/gemma-3-1b-haikuspec) in huggingface spaces.
+
 ## Models
 
 The project trains and evaluates the following models:
