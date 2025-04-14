@@ -116,7 +116,7 @@ def eval_model(model_path, prompts, print_interval=10, check_duplicates=True):
             max_new_tokens=50,
             temperature=1.0, top_p=0.95, top_k=64,
         )
-        generated_text = tokenizer.batch_decode(outputs)[0].split("model\n")[1].split("\n<end_of_turn>")[0].strip()
+        generated_text = tokenizer.batch_decode(outputs)[0].split("model\n")[1].split("<end_of_turn>")[0].strip()
         assignment = prompt["content"].split(":")[1].strip()
         
         # Calculate rewards
