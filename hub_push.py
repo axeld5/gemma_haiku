@@ -22,4 +22,4 @@ model, tokenizer = FastModel.from_pretrained(
         full_finetuning=False,
     )
 
-model.push_to_hub("axeldarmouni/gemma-3-1b-haikuspec")
+model.push_to_hub("axel-darmouni/gemma-3-1b-haikuspec")
